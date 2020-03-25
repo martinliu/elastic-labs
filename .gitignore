@@ -7,3 +7,9 @@ bin/*
 
 .kitchen/
 .kitchen.local.yml
+
+# Vagrant
+/vagrant/.vagrant/
+
+# rpm
+/vagrant/rpm/*.rpm

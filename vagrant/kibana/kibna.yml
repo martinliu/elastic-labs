@@ -1,0 +1,5 @@
+server.port: 5601
+server.host: 192.168.50.10
+elasticsearch.hosts: ["http://192.168.50.10:9200"]
+elasticsearch.username: "elastic"
+elasticsearch.password: "RO11xymgXTCD16ivTP33"

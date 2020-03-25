@@ -1,0 +1,50 @@
+#=========================== Filebeat inputs =============================
+filebeat.inputs:
+- type: log
+  enabled: false
+  paths:
+    - /var/log/*.log
+
+#============================= Filebeat modules ===============================
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: true
+  reload.period: 5s
+
+#==================== Elasticsearch template setting ==========================
+setup.template.settings:
+  index.number_of_shards: 1
+  index.codec: best_compression
+
+#================================ General =====================================
+tags: ["vagrant", "demo-service"]
+fields:
+  env: devolopment
+  proj: webinar
+
+#============================== Kibana =====================================
+setup.kibana:
+  host: "192.168.50.10:5601"  
+
+#-------------------------- Elasticsearch output ------------------------------
+output.elasticsearch:
+  hosts: ["192.168.50.10:9200"]
+  username: "elastic"
+  password: "RO11xymgXTCD16ivTP33"
+
+#================================ Processors =====================================
+processors:
+  - add_host_metadata: 
+      netinfo.enabled: true
+      cache.ttl: 5m
+      geo:
+        name: bj-dc-01
+        location: 35.5528, 116.2360
+        continent_name: Asia
+        country_iso_code: CN
+        region_name: Beijing
+        region_iso_code: CN-BJ
+        city_name: Beijing 
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~

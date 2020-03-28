@@ -30,23 +30,28 @@
 
 启动测试环境。
 
+
+```
 vagrant up
 vagrant status
+```
 
 ## 安装 Elasticsearch 服务器
 
 SSH 登录测试虚拟机。
 
-vagrant ssh
+`vagrant ssh`
 
 执行 RPM 安装命令，安装 elasticsearch 服务器。
 
+```
 cd /vagrant/rpm
 sudo rpm -ivh  ./elasticsearch-7.6.1-x86_64.rpm
 sudo systemctl daemon-reload
 sudo systemctl enable elasticsearch.service
 sudo systemctl start elasticsearch.service
 sudo systemctl status elasticsearch.service
+```
 
 
 测试 Elasticsearch 服务是否功能正常 【 Dry run 】
@@ -55,6 +60,7 @@ curl localhost:9200
 
 期待的输出类似下面。
 
+```
 {
   "name" : "elk-master",
   "cluster_name" : "elasticsearch",
@@ -73,45 +79,50 @@ curl localhost:9200
   "tagline" : "You Know, for Search"
 }
 
+```
 浏览和学习 Elasticsearch 默认的配置文件。
 
-sudo cat /etc/elasticsearch/elasticsearch.yml
+`sudo cat /etc/elasticsearch/elasticsearch.yml`
 
 使用 Elasticsearch 的精简版目标测试配置文件。
 
+```
 sudo cp /vagrant/elasticsearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
 sudo systemctl restart  elasticsearch.service
 sudo systemctl status   elasticsearch.service
 
+```
 手工查看 Elasticsearch 服务器的日志，并确认服务启动正常。
 
-sudo tail -f /var/log/elasticsearch/my-elk.log
+`sudo tail -f /var/log/elasticsearch/my-elk.log`
 
 Ctl + c 终止以上日志查看，再次测试 Elasticsearch 服务。
 
-curl localhost:9200
+`curl localhost:9200`
 
 替换为 IP 地址测试。
 
-curl http://192.168.50.10:9200/
+`curl http://192.168.50.10:9200/`
 
 ## 配置 Elasticsearch 服务的 TLS 数字证书和身份验证
 
 停止 Elasticsearch 服务。
 
-sudo systemctl stop  elasticsearch.service
+`sudo systemctl stop  elasticsearch.service`
 
 ### 创建 TLS 数字证书
 
+```
 cd /usr/share/elasticsearch
 sudo bin/elasticsearch-certutil cert -out /etc/elasticsearch/elastic-certificates.p12 -pass ""
 sudo chmod 660 /etc/elasticsearch/elastic-certificates.p12
+```
 
 ### 更新 Elasticsearch 配置文件
 
 手工打开 Elasticsearch 配置文件。
 
-sudo vi /etc/elasticsearch/elasticsearch.yml
+`sudo vi /etc/elasticsearch/elasticsearch.yml`
 
 在配置文件的末端增加下面的配置段落。
 
@@ -126,19 +137,23 @@ xpack.security.transport.ssl.truststore.path: elastic-certificates.p12
 
 重新启动配置 Elasticsearch 服务。
 
+```
 sudo systemctl restart  elasticsearch.service
 sudo systemctl status  elasticsearch.service
 
+```
 确认服务已经正常启动。
 
-sudo tail -f /var/log/elasticsearch/my-elk.log
+`sudo tail -f /var/log/elasticsearch/my-elk.log`
 
 ### 创建 Elasticsearch 服务的用户密码
 
 运行 Elasticsearch 的密码配置工具，为各种内置用户生成随机的密码。
 
+```
 sudo cd /usr/share/elasticsearch
 sudo bin/elasticsearch-setup-passwords auto
+```
 
 将生成的密码信息妥善保存备用。
 
@@ -166,24 +181,27 @@ PASSWORD elastic = RO11xymgXTCD16ivTP33
 
 ## 安装和配置 Kibana 服务器
 
-执行 KIbana 安装命令
+执行 Kibana 安装命令
 
+```
 cd /vagrant/rpm/
 sudo rpm -ivh  kibana-7.6.1-x86_64.rpm
-
+```
 查看并学习 Kibana 默认配置文件
 
-sudo cat /etc/kibana/kibana.yml
+`sudo cat /etc/kibana/kibana.yml`
 
 更新默认配置文件，准备好 elastic 用户的密码，将其更新到 Kibana 配置文件中。
 
+```
 sudo cp /vagrant/kibana/kibna.yml /etc/kibana/kibana.yml
 sudo systemctl start  kibana.service
 sudo systemctl status   kibana.service
+```
 
 查看重启的服务是否工作正常。
 
-sudo tail -f /var/log/messages
+`sudo tail -f /var/log/messages`
 
 在浏览器里测试登录 Kibana  http://192.168.50.10:5601 ，使用 elastic 的用户名和密码。
 
@@ -191,49 +209,55 @@ sudo tail -f /var/log/messages
 
 执行 Filebeat 安装包。
 
+```
 cd /vagrant/rpm
 sudo rpm -ivh ./filebeat-7.6.1-x86_64.rpm
+```
 
 查看默认的 Filebeat 配置文件。
 
-sudo cat  /etc/filebeat/filebeat.yml
+`sudo cat  /etc/filebeat/filebeat.yml`
 
 更新默认配置文件，准备好 elastic 用户的密码，将其更新到 Kibana 配置文件中。
 
-sudo cp /vagrant/filebeat/filebeat.yml /etc/filebeat/filebeat.yml
+`sudo cp /vagrant/filebeat/filebeat.yml /etc/filebeat/filebeat.yml`
 
 查看 Filebeat 的默认日志监控模块。
 
-sudo filebeat modules list
+`sudo filebeat modules list`
 
 启用 Filebeat 的 System 和 Auditd 模块，监控系统日志和基础的操作系统安全信息。
 
-sudo filebeat modules enable system auditd
+`sudo filebeat modules enable system auditd`
 
 查看 Filebeat 监控模块的配置文件。
 
+```
 sudo cd /etc/filebeat
 sudo ls -l modules.d/
+```
 
 建议查看以上启用的 System 和 Auditd 模块的配置文件。
 
 运行 Filebeat 在后台的初始化命令，在后台创建 Filebeat 所需要的索引 filebeat-* ，并导入所有模块相关的 Dashboard 等 Kibana 日志可视化分析工具。
 
-sudo filebeat setup
+`sudo filebeat setup`
 
 在浏览器中登录 http://192.168.50.10:5601 Kibana 后，点击左侧的 Dashboard 图标，查看所有刚才导入的内容，搜索并打开 System 关键字的 Dasboard。
 
 在启动日志收集代理 Filebeat 服务前，运行一下命令测试 Filebeat 配置文件的正确性。
 
-sudo filebeat test config
+`sudo filebeat test config`
 
 启动 Filebeat 服务，开始对这台操作系统的日志进行监控。
 
 
+```
 sudo systemctl start filebeat
 sudo systemctl status filebeat
+```
 
-## 建议的测试场景
+## 建议的测试
 
 
 1. 点击左侧的 Dicovery 图标，选中 Filebeat-* 索引，打开并一条日志数据，并查看所有字段；用 KQL 进行全文搜索。
@@ -241,6 +265,11 @@ sudo systemctl status filebeat
 3. 点击左侧的 Logs 图标，用鼠标上下滚动日志信息流， 点击右上角的开始 Live Stream 查看模式，观察日志信息流的自动滚动效果，在 KQL 搜素框中输入 tags : demo-service ，体验它的搜索建议功能，在 Highlight 中输入 http://192.168.50.10:5601/app/infra ，观察日志信息流显示的变化。
 4. 点击左侧的 SIEM 图标，看看这里都有什么内容。
 
+
+## 后续
+
+* 用启用 Filebeat 的 Elasticsearch, Kibana 日志监控模块
+* 安装 Apache, MySQL 等软件，并开启 Filebeat 的日志监控模块
 
 参考文档：
 https://www.elastic.co/guide/en/elasticsearch/reference/current/setting-system-settings.html

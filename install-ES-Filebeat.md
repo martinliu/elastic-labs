@@ -239,7 +239,7 @@ sudo ls -l modules.d/
 
 建议查看以上启用的 System 和 Auditd 模块的配置文件。
 
-运行 Filebeat 在后台的初始化命令，在后台创建 Filebeat 所需要的索引 filebeat-* ，并导入所有模块相关的 Dashboard 等 Kibana 日志可视化分析工具。
+运行 Filebeat 在后台的初始化命令，在后台创建 Filebeat 所需要的索引 filebeat-* ，并导入所有模块相关的 Dashboard 等 Kibana 日志可视化分析工具。下面这条命令只需要在第一个 Filebeat 的第一次运行前，执行一次，在这之后，其它所有 Filebeat 的配置文件里都不需要与 Kibana 相关的配置参数了。在后续的多节点安装中，会体现出来这个差异。
 
 `sudo filebeat setup`
 

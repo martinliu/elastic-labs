@@ -1,4 +1,4 @@
-echo I am provisioning a ELK stack...
+echo I am provisioning a Elasticsearch Server...
 date > /etc/vagrant_provisioned_at
 sudo swapoff -a
 sudo sysctl -w vm.max_map_count=262144
@@ -9,14 +9,12 @@ sudo sh -c "echo '**** Welcome to Elastic Stack Labs' >> /etc/motd"
 sudo sh -c "echo '**** --  --  --  --  --  --  --  -- ****' >> /etc/motd"
 sudo sh -c "echo '*' >> /etc/motd"
 sudo rpm -ivh /vagrant/rpm/elasticsearch-7.6.1-x86_64.rpm 
-sudo rpm -ivh /vagrant/rpm/kibana-7.6.1-x86_64.rpm
 sudo /usr/share/elasticsearch/bin/elasticsearch-certutil cert -out /etc/elasticsearch/elastic-certificates.p12 -pass ""
 sudo chmod 660 /etc/elasticsearch/elastic-certificates.p12
+sudo cp /vagrant/elasticsearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
 sudo systemctl daemon-reload
 sudo systemctl start elasticsearch.service
-sudo sh -c "echo 'server.host: 192.168.50.10' >> /etc/kibana/kibana.yml"
-sudo systemctl start kibana.service
 sudo systemctl status elasticsearch
-sudo systemctl status kibana
+sudo /usr/share/elasticsearch/bin/elasticsearch-setup-passwords auto -b
 echo Provisioning script works good!
-echo Please go to http://192.168.50.10:5601/ 
+echo Please go to http://192.168.50.10:9200/  using above passwords

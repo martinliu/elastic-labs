@@ -1,8 +1,8 @@
 # ---------------------------------- Cluster -----------------------------------
-cluster.name: my-elk
+cluster.name: elk4devops
 
 # ------------------------------------ Node ------------------------------------
-node.name: elk-master
+node.name: master1
 
 # ----------------------------------- Paths ------------------------------------
 path.data: /var/lib/elasticsearch
@@ -12,5 +12,14 @@ path.logs: /var/log/elasticsearch
 network.host: 192.168.50.10
 
 # --------------------------------- Discovery ----------------------------------
-cluster.initial_master_nodes: ["elk-master"]
+cluster.initial_master_nodes: ["master1"]
 
+# ------------------------------- TLS and Cert ---------------------------------
+xpack.security.enabled: true
+xpack.security.transport.ssl.enabled: true
+xpack.security.transport.ssl.verification_mode: certificate
+xpack.security.transport.ssl.keystore.path: elastic-certificates.p12
+xpack.security.transport.ssl.truststore.path: elastic-certificates.p12
+
+#  ------------------------------- App Search ---------------------------------
+action.auto_create_index: ".app-search-*-logs-*,-.app-search-*,+*"

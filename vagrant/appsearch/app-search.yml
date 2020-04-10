@@ -1,0 +1,9 @@
+allow_es_settings_modification: true
+elasticsearch.host: http://192.168.50.10:9200
+elasticsearch.username: elastic
+elasticsearch.password: OLOecMbV5HBKcIGJR6e6
+app_search.external_url: http://192.168.50.10:3002
+app_search.listen_host: 192.168.50.10
+app_search.listen_port: 3002
+log_directory: /var/log/app-search
+filebeat_log_directory: /var/log/app-search
